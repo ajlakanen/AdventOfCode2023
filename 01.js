@@ -56,9 +56,8 @@ const part2 = () => {
     let result = str;
     let i = 0;
     while (i < result.length - 1) {
-      for (let j = 0; j < mapping.length; ) {
+      for (let j = 0; j < mapping.length; j++) {
         if (i + mapping[j].word.length > result.length) {
-          j++;
           continue;
         }
         const sub = result.substring(i, i + mapping[j].word.length);
@@ -67,9 +66,8 @@ const part2 = () => {
             mapping[j].word,
             sub[0] + mapping[j].digit + sub[sub.length - 1] // This was a tough one. Thanks to https://www.reddit.com/r/adventofcode/comments/1884fpl/2023_day_1for_those_who_stuck_on_part_2/ for helping me with this.
           );
-          i = 0;
-          j = 0;
-        } else j++;
+          break;
+        }
       }
       i++;
     }
