@@ -25,9 +25,14 @@ const part1 = () => {
     return game;
   });
 
+  /**
+   * Returns an array of game 1-based indices that are invalid.
+   * @param {Array}   games   Games, containing draws, containing colorvalues
+   * @param {Object}  param1  Maximum values for each color
+   * @returns {Array}         Array of game indices that are invalid
+   */
   const invalidGames = (games, { maxRed, maxGreen, maxBlue }) => {
-    // Array of game indices that are invalid
-    let invalidGameNumbers = [];
+    let invalidGameIndices = [];
     // Game
     for (let i = 0; i < games.length; i++) {
       // Draw
@@ -41,13 +46,13 @@ const part1 = () => {
             (games[i][j][k].color === "blue" && games[i][j][k].value > maxBlue)
           ) {
             // For a draw that has a color with a value that is greater than the maximum value for that color, the game is invalid.
-            invalidGameNumbers.push(i + 1);
+            invalidGameIndices.push(i + 1); // 1-based index as per the assignment description
             break;
           }
         }
       }
     }
-    return invalidGameNumbers;
+    return invalidGameIndices;
   };
 
   const invalid = invalidGames(games, {
