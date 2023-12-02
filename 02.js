@@ -3,7 +3,7 @@ const f = require("fs");
 const part1 = () => {
   let lines = [];
 
-  const data = f.readFileSync("02-data.txt", "utf-8");
+  const data = f.readFileSync("data/02-data.txt", "utf-8");
   data.split(/\r?\n/).forEach((line) => {
     lines.push(line);
   });
@@ -67,7 +67,7 @@ const part1 = () => {
 const part2 = () => {
   let lines = [];
 
-  const data = f.readFileSync("02-data.txt", "utf-8");
+  const data = f.readFileSync("data/02-data.txt", "utf-8");
   data.split(/\r?\n/).forEach((line) => {
     lines.push(line);
   });
