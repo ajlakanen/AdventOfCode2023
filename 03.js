@@ -26,10 +26,13 @@ const part1 = () => {
 
   // Read the digits from the lines to a object array
   // Structure:
-  // [ { digit, i, j },
-  //   { digit, i, j+1 },
-  //   { digit, i, j+2 }, ...
-  // ]
+  // [ { digit, i_1, j_1 },
+  //   { digit, i_1, j_1+1 },
+  //   { digit, i_1, j_1+2 }, ...
+  // ],
+  // [ { digit, i_2, j_2 },
+  //   { digit, i_2, j_2+1 }, ...
+  // ], ...
   let numbers = [];
   lines.forEach((line, i_y) => {
     let number = [];
@@ -105,10 +108,13 @@ const part2 = () => {
 
   // Read all the digits from the lines to a object array
   // Structure:
-  // [ { digit, i, j },
-  //   { digit, i, j+1 },
-  //   { digit, i, j+2 }, ...
-  // ]
+  // [ { digit, i_1, j_1 },
+  //   { digit, i_1, j_1+1 },
+  //   { digit, i_1, j_1+2 }, ...
+  // ],
+  // [ { digit, i_2, j_2 },
+  //   { digit, i_2, j_2+1 }, ...
+  // ], ...
   let numbers = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
