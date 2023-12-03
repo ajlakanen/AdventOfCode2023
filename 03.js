@@ -80,20 +80,19 @@ const part1 = () => {
         }
       }
       if (symbolFound) {
-        const digits = parseInt(
+        sum += parseInt(
           number
             .map((digit) => {
               return digit.number;
             })
             .join("")
         );
-        sum += digits;
         break;
       }
     }
   }
 
-  console.log("sum", sum);
+  console.log("Part 1", sum);
 };
 
 const part2 = () => {
