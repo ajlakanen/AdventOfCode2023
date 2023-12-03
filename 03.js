@@ -31,25 +31,18 @@ const part1 = () => {
   //   { digit, i, j+2 }, ...
   // ]
   let numbers = [];
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  lines.forEach((line, i_y) => {
     let number = [];
-    for (let j = 0; j < line.length; j++) {
-      const char = line[j];
-      if (char.match(/\d/g)) {
-        number.push({ number: char, i_y: i, i_x: j });
-        if (j === line.length - 1) {
-          numbers.push(number);
-          number = [];
-        }
-      } else {
-        if (number.length > 0) {
-          numbers.push(number);
-          number = [];
-        }
+    line.split("").forEach((ch, i_x) => {
+      if (/\d/.test(ch)) {
+        number.push({ number: ch, i_y, i_x });
+      } else if (number.length) {
+        numbers.push(number);
+        number = [];
       }
-    }
-  }
+    });
+    if (number.length) numbers.push(number);
+  });
 
   const directions = [
     { x: -1, y: 0 },
@@ -72,14 +65,11 @@ const part1 = () => {
     for (let j = 0; j < number.length; j++) {
       let symbolFound = false;
       const digit = number[j];
-      const i_y = digit.i_y;
-      const i_x = digit.i_x;
 
       // Check all directions
       for (let k = 0; k < directions.length; k++) {
-        const direction = directions[k];
-        const i_y_new = i_y + direction.y;
-        const i_x_new = i_x + direction.x;
+        const i_y_new = digit.i_y + directions[k].y;
+        const i_x_new = digit.i_x + directions[k].x;
         if (
           lines[i_y_new] !== undefined &&
           lines[i_y_new][i_x_new] !== undefined &&
@@ -97,7 +87,6 @@ const part1 = () => {
             })
             .join("")
         );
-        // console.log("line", i_y, "digits", digits);
         sum += digits;
         break;
       }
