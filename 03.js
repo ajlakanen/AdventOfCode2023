@@ -71,11 +71,12 @@ const part1 = () => {
   ];
 
   /**
-   * Check if there are symbols in any direction of the number
+   * Check if there is a symbol in any direction of the number
+   * (horizontally, vertically or diagonally)
    * @param {Array}   digit       Digit
    * @param {Array}   directions  Directions to check
    * @param {String}  symbols     Symbols to check
-   * @returns {Boolean}           True if there is a symbol in any direction of the number
+   * @returns {Boolean}           True if there is a symbol in any direction of the number, false otherwise
    */
   const symbolInPerimeter = (digit, directions, symbols) => {
     for (let k = 0; k < directions.length; k++) {
