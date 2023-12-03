@@ -170,17 +170,17 @@ const part2 = () => {
   let numbersAroundStar = [];
   for (let i = 0; i < stars.length; i++) {
     const star = stars[i];
-    const y_star = star.y;
-    const x_star = star.x;
     for (let j = 0; j < directions.length; j++) {
       const direction = directions[j];
-      const i_y_new = y_star + direction.y;
-      const i_x_new = x_star + direction.x;
-      // If numbers-array contains a number at the
+
+      // If numbers-array contains a number (at least a single digit) at the
       // location of the star, add it to numbersAroundStar
-      const aroundStar = numbers.map((number) =>
+      numbers.map((number) =>
         number.filter((digit) => {
-          if (digit.y === i_y_new && digit.x === i_x_new) {
+          if (
+            digit.y === star.y + direction.y &&
+            digit.x === star.x + direction.x
+          ) {
             // If number is already added to numbersAroundStar, don't add it again
             if (!numbersAroundStar.find((n) => n.number === number)) {
               numbersAroundStar.push({ number: number, star: star });
@@ -194,9 +194,8 @@ const part2 = () => {
   // Select stars that appear exactly 2 times in numbersAroundStar
   let starsWithTwoNumbers = [];
   for (let i = 0; i < numbersAroundStar.length; i++) {
-    const numberAroundStar = numbersAroundStar[i];
-    const star = numberAroundStar.star;
-    const number = numberAroundStar.number;
+    const number = numbersAroundStar[i].number;
+    const star = numbersAroundStar[i].star;
     const count = numbersAroundStar.filter((n) => n.star === star).length;
     if (count === 2) {
       starsWithTwoNumbers.push({
