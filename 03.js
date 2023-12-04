@@ -1,5 +1,4 @@
 const f = require("fs");
-const { get } = require("http");
 
 /**
  * Read the digits from the lines to a object array
