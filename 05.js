@@ -168,8 +168,8 @@ const part2 = () => {
   const applyRanges = (valueRanges, mapRanges) => {
     {
       const newValueRanges = valueRanges.map((valueRange) => {
-        const currentMapRange = mapRanges.filter((mapRange) => {
-          if (
+        const currentMapRanges = mapRanges.filter((mapRange) => {
+          /*if (
             valueRange.start >= mapRange.in &&
             valueRange.start + valueRange.length > mapRange.in + mapRange.length
           ) {
@@ -183,17 +183,26 @@ const part2 = () => {
           return (
             valueRange.start >= mapRange.in &&
             valueRange.start < mapRange.in + mapRange.length
+          );*/
+          return (
+            (valueRange.start >= mapRange.in &&
+              valueRange.start < mapRange.in + mapRange.length) ||
+            (valueRange.start + valueRange.length > mapRange.in &&
+              valueRange.start + valueRange.length <=
+                mapRange.in + mapRange.length)
           );
         });
-        console.log("valueRange", valueRange);
-        console.log("currentMapRange[0]", currentMapRange[0]);
+        //console.log("valueRange", valueRange);
 
-        if (currentMapRange.length === 0) {
-          console.log("No source range found for value range", valueRange);
+        if (currentMapRanges.length === 0) {
+          console.log("No map range found for value range", valueRange);
+          return valueRange;
         }
-        const diff = valueRange.start - currentMapRange.start;
+        console.log("currentMapRanges", currentMapRanges);
+
+        const diff = valueRange.start - currentMapRanges.start;
         return {
-          start: currentMapRange.out + diff,
+          start: currentMapRanges.out + diff,
           length: valueRange.length,
         };
       });
