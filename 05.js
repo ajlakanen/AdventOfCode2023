@@ -132,20 +132,6 @@ const part2 = () => {
     }
     return acc;
   }, []);
-  // console.log(seeds_);
-  /*
-  let seeds = [];
-  for (let i = 0; i < seeds_.length; i += 2) {
-    seeds.push(
-      Array(seeds_[i + 1])
-        .fill(seeds_[i])
-        .map((seed, index) => {
-          return seed + index;
-        })
-    );
-  }
-  seeds = seeds.flat();
-*/
 
   const grouped = groupBy(lines, "")
     .map((group) => {
