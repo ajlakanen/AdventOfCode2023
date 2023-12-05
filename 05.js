@@ -123,7 +123,7 @@ const part2 = () => {
     .split(": ")[1]
     .split(" ")
     .map((seed) => {
-      return BigInt(parseInt(seed));
+      return parseInt(seed);
     });
   // console.log(initialSeeds);
 
@@ -134,7 +134,7 @@ const part2 = () => {
     return acc;
   }, []);
 
-  // console.log("seedRanges", seedRanges);
+  console.log("seedRanges", seedRanges);
 
   const groupedMaps = groupBy(lines, "")
     .map((group) => {
@@ -157,55 +157,139 @@ const part2 = () => {
     })
     .slice(1);
 
-  groupedMaps.reverse();
-  // console.log(groupedMaps[0]);
+  //console.log("groupedMaps", groupedMaps);
 
-  const whenToStop = groupedMaps[0].maps.reduce(
-    (acc, map) => (map.in > acc ? map.in : acc),
-    groupedMaps[0].maps[0].in
-  );
-  let ii = 0;
-  while (ii < whenToStop) {
-    let minOutput =
-      groupedMaps[0].maps.reduce(
-        (acc, map) => (map.out < acc ? map.out : acc),
-        groupedMaps[0].maps[0].out
-      ) + BigInt(ii);
+  /**
+   * Apply mappings to value ranges
+   * @param {Array} valueRanges Start of the range and length of the range
+   * @param {Array} mapRanges Mappings from source to dest
+   * @returns
+   */
+  const applyRanges = (valueRanges, mapRanges) => {
+    {
+      const newValueRanges = valueRanges.map((valueRange) => {
+        const currentMapRange = mapRanges.filter((mapRange) => {
+          if (
+            valueRange.start >= mapRange.in &&
+            valueRange.start + valueRange.length > mapRange.in + mapRange.length
+          ) {
+            console.log(
+              "Value range was partly within the map range",
+              valueRange,
+              mapRange
+            );
+            return;
+          }
+          return (
+            valueRange.start >= mapRange.in &&
+            valueRange.start < mapRange.in + mapRange.length
+          );
+        });
+        console.log("valueRange", valueRange);
+        console.log("currentMapRange[0]", currentMapRange[0]);
 
-    //console.log("initial minOutput", minOutput);
-    for (let i = 0; i < groupedMaps.length; i++) {
-      for (let j = 0; j < groupedMaps[i].maps.length; j++) {
-        const min = groupedMaps[i].maps[j].out;
-        const max = groupedMaps[i].maps[j].out + groupedMaps[i].maps[j].length; // exclusive
-        if (min <= minOutput && max > minOutput) {
-          /*console.log(
-            "found",
-            "from",
-            groupedMaps[i].dest,
-            "to",
-            groupedMaps[i].source,
-            min,
-            "<",
-            minOutput,
-            "<",
-            max,
-            " --> ",
-            groupedMaps[i].maps[j].in,
-            "+",
-            minOutput - min
-          );*/
-          const diff = minOutput - min;
-          minOutput = groupedMaps[i].maps[j].in + diff;
-          //console.log("new minOutput", minOutput);
-          break;
+        if (currentMapRange.length === 0) {
+          console.log("No source range found for value range", valueRange);
         }
-      }
+        const diff = valueRange.start - currentMapRange.start;
+        return {
+          start: currentMapRange.out + diff,
+          length: valueRange.length,
+        };
+      });
+      return newValueRanges;
     }
-    if (initialSeeds.includes(minOutput)) {
-      console.log("found seed", minOutput);
-      break;
-    } else ii++;
-  }
+  };
+
+  const applyMappings = (valueRanges, mappings) => {
+    let newValueRanges = valueRanges;
+    for (let i = 0; i < mappings.length; i++) {
+      const mapping = mappings[i].maps;
+      newValueRanges = applyRanges(newValueRanges, mapping);
+    }
+    return newValueRanges;
+  };
+
+  const newMappings = applyMappings(seedRanges, groupedMaps);
+  console.log("newMappings", newMappings);
+
+  // let ii = 0;
+  // while (ii < whenToStop) {
+  //   let minOutput =
+  //     groupedMaps[0].maps.reduce(
+  //       (acc, map) => (map.out < acc ? map.out : acc),
+  //       groupedMaps[0].maps[0].out
+  //     ) + BigInt(ii);
+
+  // let min = 9999999999999999999999;
+  // for (let k = 0; k < groupedMaps[0].maps.length; k++) {
+  //   // groupedMaps[0].maps.forEach((firstMap) => {
+  //   const firstMap = groupedMaps[0].maps[k];
+  //   let ii = 0;
+  //
+  //   console.log("firstmap", firstMap);
+  //   console.log("firstmap.length", firstMap.length);
+  //   while (ii < firstMap.length) {
+  //     const initialOutput = firstMap.out + BigInt(ii);
+  //     let minOutput = firstMap.out + BigInt(ii);
+  //     // if (ii % 100000 === 0)
+  //     //   console.log(
+  //     //     "initial minOutput",
+  //     //     minOutput,
+  //     //     firstMap.out,
+  //     //     ii,
+  //     //     firstMap.length
+  //     //   );
+  //     for (let i = 0; i < groupedMaps.length; i++) {
+  //       // console.log("i", i);
+  //       for (let j = 0; j < groupedMaps[i].maps.length; j++) {
+  //         // console.log("j", j);
+  //         // is minOutput in the range of the current map?
+  //         const min = groupedMaps[i].maps[j].out;
+  //         const max =
+  //           groupedMaps[i].maps[j].out + groupedMaps[i].maps[j].length; // exclusive end
+  //         if (min <= minOutput && max > minOutput) {
+  //           /*console.log(
+  //           "found",
+  //           "from",
+  //           groupedMaps[i].dest,
+  //           "to",
+  //           groupedMaps[i].source,
+  //           min,
+  //           "<",
+  //           minOutput,
+  //           "<",
+  //           max,
+  //           " --> ",
+  //           groupedMaps[i].maps[j].in,
+  //           "+",
+  //           minOutput - min
+  //         );*/
+  //           const diff = minOutput - min;
+  //           minOutput = groupedMaps[i].maps[j].in + diff;
+  //           //console.log("new minOutput", minOutput);
+  //           break;
+  //         }
+  //       }
+  //     }
+  //     //if (initialSeeds.includes(minOutput)) {
+  //     initialSeeds.reduce((acc, seed, index) => {
+  //       if (index % 2 === 0) {
+  //         if (minOutput >= seed && minOutput < seed + initialSeeds[index + 1]) {
+  //           if (minOutput < min) {
+  //             min = minOutput;
+  //             console.log("found seed", minOutput, "output", initialOutput);
+  //           }
+  //           return;
+  //         }
+  //       }
+  //       return acc;
+  //     });
+  //
+  //     //}
+  //     ii++;
+  //   }
+  // }
 
   // TODO: This is too slow :-(. Need to find a way to reduce the number of seeds.
   /*
