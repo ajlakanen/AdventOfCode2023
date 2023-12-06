@@ -143,9 +143,9 @@ const part2 = () => {
       )[0];
       const mappings = group.slice(1).map((line) => {
         return {
-          out: BigInt(parseInt(line.split(" ")[0])),
-          in: BigInt(parseInt(line.split(" ")[1])),
-          length: BigInt(parseInt(line.split(" ")[2])),
+          out: parseInt(line.split(" ")[0]),
+          in: parseInt(line.split(" ")[1]),
+          length: parseInt(line.split(" ")[2]),
         };
       });
 
@@ -157,7 +157,133 @@ const part2 = () => {
     })
     .slice(1);
 
-  //console.log("groupedMaps", groupedMaps);
+  console.log("groupedMaps", groupedMaps[0]);
+
+  const isValueRangeInMapRange = (valueRange, mapRange) => {
+    return (
+      valueRange.start >= mapRange.in &&
+      valueRange.start < mapRange.in + mapRange.length
+    );
+  };
+
+  const mapRangeMin = (valueRange, mapGroups) => {
+    if (valueRange.length === 0) return valueRange;
+    if (mapGroups.length === 0) {
+      console.log("valueRange", valueRange);
+
+      return valueRange;
+    }
+    const nextMaps = mapGroups[0].maps.sort((a, b) => a.in - b.in);
+    // console.log(maps[0].source, "to", maps[0].dest);
+    if (nextMaps === undefined) {
+      // console.log("valueRange", valueRange);
+      return Math.min(...valueRange);
+    }
+
+    // nextMaps.map((map) => {
+    //   console.log(
+    //     map,
+    //     map.in <= valueRange.start && map.in + map.length > valueRange.start,
+    //     valueRange.start + valueRange.length > map.in &&
+    //       valueRange.start + valueRange.length <= map.in + map.length
+    //   );
+    // });
+    // console.log(valueRange, nextMaps);
+    currRangeLength = 0;
+    let currRangeStart = valueRange.start;
+    //console.log("maps.length", maps.length);
+
+    // get the tail of the maps
+    const [headOfMapGroups, ...tailOfMapGroups] = mapGroups;
+
+    //console.log("tailOfMaps.length", tailOfMaps.length);
+    //console.log("tailOfMaps", tailOfMapGroups);
+    for (let i = 0; i < nextMaps.length; i++) {
+      if (!isValueRangeInMapRange(valueRange, nextMaps[i]))
+        mapRangeMin(valueRange, tailOfMapGroups);
+      const map = nextMaps[i];
+
+      if (map.in > valueRange.start) {
+        console.log("valueRange", valueRange);
+        return Math.min(
+          mapRangeMin(
+            { start: valueRange.start, length: map.in - valueRange.start },
+            tailOfMapGroups
+          ),
+          mapRangeMin(
+            {
+              start: map.out,
+              length: valueRange.start + valueRange.length - map.in,
+            },
+            tailOfMapGroups
+          )
+        );
+      }
+
+      if (map.in === valueRange.start && map.length < valueRange.length) {
+        console.log("valueRange", valueRange);
+        return Math.min(
+          mapRangeMin(
+            {
+              start: valueRange.start + map.length,
+              length: valueRange.length - map.length,
+            },
+            tailOfMapGroups
+          ),
+          mapRangeMin(
+            {
+              start: map.out,
+              length: map.length,
+            },
+            tailOfMapGroups
+          )
+        );
+      }
+
+      if (
+        map.in < valueRange.start &&
+        map.in + map.length < valueRange.start + valueRange.length
+      ) {
+        return Math.min(
+          mapRangeMin(
+            {
+              start: map.out,
+              length: map.length - (valueRange.start - map.in),
+            },
+            tailOfMapGroups
+          ),
+          mapRangeMin(
+            {
+              start:
+                valueRange.start + map.length - (valueRange.start - map.in),
+            },
+            tailOfMapGroups
+          )
+        );
+      }
+
+      const rangeStart = Math.max(currRangeStart, map.in);
+      const rangeEnd = Math.min(
+        currRangeStart + currRangeLength,
+        map.in + map.length
+      );
+
+      if (
+        map.in <= valueRange.start &&
+        map.in + map.length > valueRange.start
+      ) {
+        currRangeLength = map.length;
+        break;
+      }
+    }
+  };
+
+  console.log(
+    mapRangeMin(
+      { start: initialSeeds[0], length: initialSeeds[1] },
+      groupedMaps
+    )
+  );
 
   /**
    * Apply mappings to value ranges
@@ -169,7 +295,8 @@ const part2 = () => {
     {
       const newValueRanges = valueRanges.map((values) => {
         const currentMaps = maps.filter((map) => {
-          /*if (
+          /*
+          if (
             valueRange.start >= mapRange.in &&
             valueRange.start + valueRange.length > mapRange.in + mapRange.length
           ) {
@@ -217,8 +344,8 @@ const part2 = () => {
     return newValueRanges;
   };
 
-  const newMappings = applyMappings(seedRanges, groupedMaps);
-  console.log("newMappings", newMappings);
+  // const newMappings = applyMappings(seedRanges, groupedMaps);
+  // console.log("newMappings", newMappings);
 
   // let ii = 0;
   // while (ii < whenToStop) {
