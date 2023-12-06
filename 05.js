@@ -162,13 +162,13 @@ const part2 = () => {
   /**
    * Apply mappings to value ranges
    * @param {Array} valueRanges Start of the range and length of the range
-   * @param {Array} mapRanges Mappings from source to dest
+   * @param {Array} maps Mappings from source to dest
    * @returns
    */
-  const applyRanges = (valueRanges, mapRanges) => {
+  const applyRanges = (valueRanges, maps) => {
     {
-      const newValueRanges = valueRanges.map((valueRange) => {
-        const currentMapRanges = mapRanges.filter((mapRange) => {
+      const newValueRanges = valueRanges.map((values) => {
+        const currentMaps = maps.filter((map) => {
           /*if (
             valueRange.start >= mapRange.in &&
             valueRange.start + valueRange.length > mapRange.in + mapRange.length
@@ -185,25 +185,23 @@ const part2 = () => {
             valueRange.start < mapRange.in + mapRange.length
           );*/
           return (
-            (valueRange.start >= mapRange.in &&
-              valueRange.start < mapRange.in + mapRange.length) ||
-            (valueRange.start + valueRange.length > mapRange.in &&
-              valueRange.start + valueRange.length <=
-                mapRange.in + mapRange.length)
+            (values.start >= map.in && values.start < map.in + map.length) ||
+            (values.start + values.length > map.in &&
+              values.start + values.length <= map.in + map.length)
           );
         });
         //console.log("valueRange", valueRange);
 
-        if (currentMapRanges.length === 0) {
-          console.log("No map range found for value range", valueRange);
-          return valueRange;
+        if (currentMaps.length === 0) {
+          console.log("No map range found for value range", values);
+          return values;
         }
-        console.log("currentMapRanges", currentMapRanges);
+        console.log("currentMapRanges", currentMaps);
 
-        const diff = valueRange.start - currentMapRanges.start;
+        const diff = values.start - currentMaps.start;
         return {
-          start: currentMapRanges.out + diff,
-          length: valueRange.length,
+          start: currentMaps.out + diff,
+          length: values.length,
         };
       });
       return newValueRanges;
