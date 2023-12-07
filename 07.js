@@ -14,20 +14,21 @@ const getHandType = (cardStrenghts, jokers = false) => {
   const jokersAmount = jokers ? 5 - cardStrenghts.length : 0;
   const sorted = cardStrenghts.sort((a, b) => b - a);
 
-  // Five of a kind (7)
+  // Five of a kind (7 points)
   const fiveOfAKind =
     sorted.filter((strength) => strength === sorted[0]).length === 5;
   if (fiveOfAKind) return 7;
 
-  // Four of a kind
+  // Four of a kind (6 points)
   const fourOfAKind = sorted.some((strength) => {
     const filtered = sorted.filter((s) => s === strength);
     return filtered.length === 4;
   });
+  // 4 of a kind with 1 joker is 7 points
   if (fourOfAKind && jokersAmount >= 1) return 7;
   if (fourOfAKind) return 6;
 
-  // Full house
+  // Full house (5 points)
   const fullHouse = sorted.some((strength) => {
     const filtered = sorted.filter((s) => s === strength);
     return (
@@ -38,18 +39,21 @@ const getHandType = (cardStrenghts, jokers = false) => {
       })
     );
   });
+  // Full house (5 cards) can't have any jokers
   if (fullHouse) return 5;
 
-  // Three of a kind
+  // Three of a kind (4 points)
   const threeOfAKind = sorted.some((strength) => {
     const filtered = sorted.filter((s) => s === strength);
     return filtered.length === 3;
   });
+  // Three of a kind with 2 jokers can only be five of a kind (7 points).
+  // Similarly, 3 of a kind with 1 joker can only be four of a kind (6 points).
   if (threeOfAKind && jokersAmount === 2) return 7;
   if (threeOfAKind && jokersAmount === 1) return 6;
   if (threeOfAKind) return 4;
 
-  // Two pair
+  // Two pair (3 points)
   const twoPairs = sorted.some((strength) => {
     const firstPair = sorted.filter((s) => s === strength);
     // remove first pair from sorted
@@ -63,7 +67,7 @@ const getHandType = (cardStrenghts, jokers = false) => {
   if (twoPairs && jokersAmount === 1) return 5;
   if (twoPairs) return 3;
 
-  // One pair
+  // One pair (2 points)
   const onePair = sorted.some((strength) => {
     const filtered = sorted.filter((s) => s === strength);
     return filtered.length === 2;
@@ -73,7 +77,7 @@ const getHandType = (cardStrenghts, jokers = false) => {
   if (onePair && jokersAmount === 1) return 4;
   if (onePair) return 2;
 
-  // High card
+  // High card (1 point)
   if (jokersAmount >= 4) return 7;
   if (jokersAmount === 3) return 6;
   if (jokersAmount === 2) return 4;
