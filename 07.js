@@ -179,7 +179,7 @@ const part2 = () => {
     { card: "J", strength: 1 },
   ];
 
-  const getHandStrengths = (cards) => {
+  const getCardStrengths = (cards) => {
     const splitted = cards.split("").map((card) => {
       return strengths.find((strength) => strength.card === card).strength;
     });
@@ -191,8 +191,8 @@ const part2 = () => {
     return {
       cards: splitted[0],
       bid: parseInt(splitted[1]),
-      strengths: getHandStrengths(splitted[0]),
-      type: getHandType(getHandStrengths(splitted[0]), true),
+      strengths: getCardStrengths(splitted[0]),
+      type: getHandType(getCardStrengths(splitted[0]), true),
     };
   });
 
