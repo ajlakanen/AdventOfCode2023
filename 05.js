@@ -160,7 +160,7 @@ const part2 = () => {
   // Value range is completely out of the map range
   const valuesOutOfMap = (values, map) => {
     return (
-      map.in > values.start + values.length ||
+      map.in > values.start + values.length - 1 ||
       map.in + map.length <= values.start
     );
   };
@@ -230,7 +230,8 @@ const part2 = () => {
       // Reached the end of the map groups
       return values;
     }
-    const nextMaps = mapGroups[0].maps;
+    const nextMaps = mapGroups[0].maps.sort((a, b) => a.out - b.out);
+    // console.log("nextMaps", nextMaps);
 
     // Get the tail of the map groups
     const [headOfMapGroups, ...tailOfMapGroups] = mapGroups;
@@ -317,15 +318,19 @@ const part2 = () => {
   };
 
   let min = mapRangeMin(initialSeeds[0], mapGroups);
+  console.log(min);
   for (let i = 1; i < initialSeeds.length; i++) {
     const seed = initialSeeds[i];
     const mapped = mapRangeMin(seed, mapGroups);
+    console.log(mapped);
     if (mapped.start < min.start) {
       min = mapped;
     }
   }
+  // The minimum is 0 but the actual minimum is the start of the fourth map.
+  // WHY???
 
-  console.log("Part 2", min);
+  // console.log("Part 2", min);
 };
 
 part1();
