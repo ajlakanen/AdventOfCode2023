@@ -152,14 +152,68 @@ const part2 = () => {
     })
     .slice(1);
 
-  const isValueRangeOutofMapRange = (valueRange, mapRange) => {
+  // [<--MAP-->]
+  //             [<--VALUES-->]
+  // or
+  //                [<--MAP-->]
+  // [<--VALUES-->]
+  // Value range is completely out of the map range
+  const valuesOutOfMap = (values, map) => {
     return (
-      //valueRange.start >= mapRange.in &&
-      //valueRange.start < mapRange.in + mapRange.length
-      //valueRange.start >= mapRange.in &&
-      //valueRange.start < mapRange.in + mapRange.length
-      mapRange.in > valueRange.start + valueRange.length ||
-      mapRange.in + mapRange.length < valueRange.start
+      map.in > values.start + values.length ||
+      map.in + map.length <= values.start
+    );
+  };
+
+  // [<---MAP------>]
+  // [<---VALUES--->]
+  // or
+  // [<-------MAP------->]
+  //   [<---VALUES--->]
+  // The value range is completely within the map range
+  const valuesWithinMap = (values, map) => {
+    return (
+      map.in <= values.start &&
+      map.in + map.length >= values.start + values.length
+    );
+  };
+
+  // [<---MAP--->]
+  //     [<---VALUES--->]
+  // or
+  // [<---MAP--->]
+  // [<---VALUES--->]
+  // The map starts before the value range start (or exactly at the start)
+  // and ends before the value range ends
+  const mapStartsBeforeValues = (values, map) => {
+    return (
+      map.in <= values.start &&
+      map.in + map.length > values.start &&
+      map.in + map.length < values.start + values.length
+    );
+  };
+
+  //       [<---MAP--->]
+  // [<---VALUES--->]
+  // or
+  //    [<---MAP--->]
+  // [<---VALUES--->]
+  // Values start before map, but end before (or at) map ends
+  const valuesPartlyWithinMap = (values, map) => {
+    return (
+      map.in > values.start &&
+      map.in < values.start + values.length &&
+      map.in + map.length >= values.start + values.length
+    );
+  };
+
+  //     [<----MAP---->]
+  // [<-----VALUES------->]
+  // The map starts after the value range starts and ends before the value range ends
+  const mapeWithinValues = (values, map) => {
+    return (
+      map.in > values.start &&
+      map.in + map.length < values.start + values.length
     );
   };
 
@@ -167,58 +221,37 @@ const part2 = () => {
    * This is the core of the solution. It maps the value range to the minimum
    * value range. It does this by iterating through the map groups and
    * recursively calling itself until it reaches the end of the map groups.
-   * @param {Object} valueRange Value range to map
+   * @param {Object} values Value range to map
    * @param {Array} mapGroups Map groups to map the value range
    * @returns {Object} The mapped value range
    */
-  const mapRangeMin = (valueRange, mapGroups) => {
+  const mapRangeMin = (values, mapGroups) => {
     if (mapGroups.length === 0) {
       // Reached the end of the map groups
-      return valueRange;
+      return values;
     }
-    const nextMaps = mapGroups[0].maps.sort((a, b) => a.in - b.in);
+    const nextMaps = mapGroups[0].maps;
 
     // Get the tail of the map groups
     const [headOfMapGroups, ...tailOfMapGroups] = mapGroups;
 
     for (let i = 0; i < nextMaps.length; i++) {
       const map = nextMaps[i];
-      if (isValueRangeOutofMapRange(valueRange, map)) continue;
+      if (valuesOutOfMap(values, map)) continue;
 
-      // [<---MAP------>]
-      // [<---VALUES--->]
-      // or
-      // [<-------MAP------->]
-      //   [<---VALUES--->]
-      // The value range is completely within the map range
-      if (
-        map.in <= valueRange.start &&
-        map.in + map.length >= valueRange.start + valueRange.length
-      ) {
-        const diff = valueRange.start - map.in;
-
+      if (valuesWithinMap(values, map)) {
+        const diff = values.start - map.in;
         return mapRangeMin(
           {
             start: map.out + diff,
-            length: valueRange.length,
+            length: values.length,
           },
           tailOfMapGroups
         );
       }
 
-      // [<---MAP--->]
-      //     [<---VALUES--->]
-      // or
-      // [<---MAP--->]
-      // [<---VALUES--->]
-      // The map starts before the value range start (or exactly at the start)
-      // and ends before the value range ends
-      if (
-        map.in <= valueRange.start &&
-        map.in + map.length > valueRange.start &&
-        map.in + map.length < valueRange.start + valueRange.length
-      ) {
-        const diff = valueRange.start - map.in;
+      if (mapStartsBeforeValues(values, map)) {
+        const diff = values.start - map.in;
         const head = mapRangeMin(
           {
             start: map.out + diff,
@@ -229,39 +262,27 @@ const part2 = () => {
 
         const tail = mapRangeMin(
           {
-            start: valueRange.start + map.length - diff,
-            length: valueRange.length - head.length,
+            start: values.start + map.length - diff,
+            length: values.length - head.length,
           },
-          // tailOfMapGroups
           mapGroups
         );
         return head.start < tail.start ? head : tail;
       }
 
-      //       [<---MAP--->]
-      // [<---VALUES--->]
-      // or
-      //    [<---MAP--->]
-      // [<---VALUES--->]
-      // The map starts after the value range starts and ends after the value range ends
-      if (
-        map.in > valueRange.start &&
-        map.in < valueRange.start + valueRange.length &&
-        map.in + map.length >= valueRange.start + valueRange.length
-      ) {
-        const diff = map.in - valueRange.start;
+      if (valuesPartlyWithinMap(values, map)) {
+        const diff = map.in - values.start;
         const head = mapRangeMin(
           {
-            start: valueRange.start,
+            start: values.start,
             length: diff,
           },
-          // tailOfMapGroups
           mapGroups
         );
         const tail = mapRangeMin(
           {
             start: map.out,
-            length: valueRange.length - head.length,
+            length: values.length - head.length,
           },
           tailOfMapGroups
         );
@@ -270,56 +291,40 @@ const part2 = () => {
 
       //     [<----MAP---->]
       // [<-----VALUES------->]
-      // The map starts after the value range starts and ends before the value range ends
-      // if (
-      //   map.in > valueRange.start &&
-      //   map.in + map.length < valueRange.start + valueRange.length
-      // ) {
-      //   const head = mapRangeMin(
-      //     {
-      //       start: valueRange.start,
-      //       length: map.in - valueRange.start,
-      //     },
-      //     mapGroups
-      //   );
-      //
-      //   const mid = mapRangeMin(
-      //     {
-      //       start: map.out,
-      //       length: map.length,
-      //     },
-      //     tailOfMapGroups
-      //   );
-      //
-      //   const tail = mapRangeMin(
-      //     {
-      //       start: map.in + map.length,
-      //       length: valueRange.length - (head.length + mid.length),
-      //     },
-      //     tailOfMapGroups
-      //   );
-      //   let minPart = head;
-      //   if (mid.start < minPart.start) minPart = mid;
-      //   if (tail.start < minPart.start) minPart = tail;
-      //   return minPart;
-      // }
+      if (mapeWithinValues(values, map)) {
+        const diff = map.in - values.start;
+        const head = mapRangeMin(
+          {
+            start: values.start,
+            length: diff,
+          },
+          mapGroups
+        );
+
+        const tail = mapRangeMin(
+          {
+            start: map.in,
+            length: values.length - head.length,
+          },
+          mapGroups
+        );
+        return head.start < tail.start ? head : tail;
+      }
     }
 
     // Value range is not in any of the map ranges
-    return mapRangeMin(valueRange, tailOfMapGroups);
+    return mapRangeMin(values, tailOfMapGroups);
   };
 
-  const min = initialSeeds.reduce((acc, seed) => {
-    const min = mapRangeMin(seed, mapGroups);
-    return acc < min.start ? acc : min.start;
-  }, initialSeeds[0].start);
+  let min = mapRangeMin(initialSeeds[0], mapGroups);
+  for (let i = 1; i < initialSeeds.length; i++) {
+    const seed = initialSeeds[i];
+    const mapped = mapRangeMin(seed, mapGroups);
+    if (mapped.start < min.start) {
+      min = mapped;
+    }
+  }
 
-  const minMap = initialSeeds.map((seed) => {
-    const min = mapRangeMin(seed, mapGroups);
-    return min;
-  });
-
-  console.log("Part 2", minMap);
   console.log("Part 2", min);
 };
 
