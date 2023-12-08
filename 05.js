@@ -152,10 +152,14 @@ const part2 = () => {
     })
     .slice(1);
 
-  const isValueRangeInMapRange = (valueRange, mapRange) => {
+  const isValueRangeOutofMapRange = (valueRange, mapRange) => {
     return (
-      valueRange.start >= mapRange.in &&
-      valueRange.start < mapRange.in + mapRange.length
+      //valueRange.start >= mapRange.in &&
+      //valueRange.start < mapRange.in + mapRange.length
+      //valueRange.start >= mapRange.in &&
+      //valueRange.start < mapRange.in + mapRange.length
+      mapRange.in > valueRange.start + valueRange.length ||
+      mapRange.in + mapRange.length < valueRange.start
     );
   };
 
@@ -179,7 +183,7 @@ const part2 = () => {
 
     for (let i = 0; i < nextMaps.length; i++) {
       const map = nextMaps[i];
-      if (!isValueRangeInMapRange(valueRange, map)) continue;
+      if (isValueRangeOutofMapRange(valueRange, map)) continue;
 
       // [<---MAP------>]
       // [<---VALUES--->]
@@ -228,7 +232,8 @@ const part2 = () => {
             start: valueRange.start + map.length - diff,
             length: valueRange.length - head.length,
           },
-          tailOfMapGroups
+          // tailOfMapGroups
+          mapGroups
         );
         return head.start < tail.start ? head : tail;
       }
@@ -250,7 +255,8 @@ const part2 = () => {
             start: valueRange.start,
             length: diff,
           },
-          tailOfMapGroups
+          // tailOfMapGroups
+          mapGroups
         );
         const tail = mapRangeMin(
           {
@@ -261,6 +267,42 @@ const part2 = () => {
         );
         return head.start < tail.start ? head : tail;
       }
+
+      //     [<----MAP---->]
+      // [<-----VALUES------->]
+      // The map starts after the value range starts and ends before the value range ends
+      // if (
+      //   map.in > valueRange.start &&
+      //   map.in + map.length < valueRange.start + valueRange.length
+      // ) {
+      //   const head = mapRangeMin(
+      //     {
+      //       start: valueRange.start,
+      //       length: map.in - valueRange.start,
+      //     },
+      //     mapGroups
+      //   );
+      //
+      //   const mid = mapRangeMin(
+      //     {
+      //       start: map.out,
+      //       length: map.length,
+      //     },
+      //     tailOfMapGroups
+      //   );
+      //
+      //   const tail = mapRangeMin(
+      //     {
+      //       start: map.in + map.length,
+      //       length: valueRange.length - (head.length + mid.length),
+      //     },
+      //     tailOfMapGroups
+      //   );
+      //   let minPart = head;
+      //   if (mid.start < minPart.start) minPart = mid;
+      //   if (tail.start < minPart.start) minPart = tail;
+      //   return minPart;
+      // }
     }
 
     // Value range is not in any of the map ranges
@@ -271,6 +313,13 @@ const part2 = () => {
     const min = mapRangeMin(seed, mapGroups);
     return acc < min.start ? acc : min.start;
   }, initialSeeds[0].start);
+
+  const minMap = initialSeeds.map((seed) => {
+    const min = mapRangeMin(seed, mapGroups);
+    return min;
+  });
+
+  console.log("Part 2", minMap);
   console.log("Part 2", min);
 };
 
