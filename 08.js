@@ -85,7 +85,7 @@ const part2 = () => {
   }, []);
 
   const nodesWithA = Object.keys(tree).filter((key) => key[2] === "A");
-  console.log("nodesWithA", nodesWithA);
+  // console.log("nodesWithA", nodesWithA);
 
   const newNodes = (keys, tree, instruction) => {
     return keys.map((key) => {
@@ -97,43 +97,40 @@ const part2 = () => {
 
   const instructions = lines[0];
   let nodesNow = nodesWithA;
-  let i = 0;
-  // while (true) {
-  //   const instruction = instructions[i % instructions.length];
-  //   nodesNow = newNodes(nodesNow, tree, instruction);
-  //   console.log(nodesNow);
-  //   if (nodesNow.every((node) => node[2] === "Z")) {
-  //     break;
-  //   }
-  //   i++;
-  // }
 
+  // How long does it take to reach Z from each node
   const countsToReachZ = nodesNow.map((node) => {
     let nodesNow = [node];
+    const howManyStepsToZ = [];
     let i = 0;
+    let j = 0;
     while (true) {
       const instruction = instructions[i % instructions.length];
       nodesNow = newNodes(nodesNow, tree, instruction);
       if (nodesNow.every((node) => node[2] === "Z")) {
-        return i;
+        howManyStepsToZ.push(i + 1);
+        if (i > 1 && (i + 1) % howManyStepsToZ[0] !== 0) {
+          console.log(
+            "not divisible!!",
+            i + 1,
+            "howManyStepsToZ",
+            howManyStepsToZ
+          );
+        }
+        j++;
+        if (j > 0) {
+          return howManyStepsToZ;
+        }
       }
       i++;
     }
   });
 
-  let j = 1;
-  while (true) {
-    const newValues = countsToReachZ.map((count) => count * j);
-    //console.log(newValues);
-    // check if all values are the same
-    if (newValues.every((value) => value === newValues[0])) {
-      console.log("all values are the same", newValues[0]);
-      break;
-    }
-    j++;
-  }
-  console.log(countsToReachZ);
-  console.log(nodesNow);
+  console.log(countsToReachZ.flat());
+
+  // }
+  //console.log(counts);
+  //console.log(nodesNow, i);
 };
 
 part1();
