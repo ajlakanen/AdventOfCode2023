@@ -48,11 +48,6 @@ const part1 = () => {
     return acc + extrapolated;
   }, 0);
   console.log("Part 1", sum);
-
-  for (let i = 0; i < data.length; i++) {
-    const line = data[i];
-    const extrapolated = line[line.length - 1] + extrapolate(diffLists(line));
-  }
 };
 
 const part2 = () => {
@@ -74,9 +69,6 @@ const part2 = () => {
     return result[0][0];
   };
 
-  const testData = data[2];
-  const testDiffLists = diffLists(testData);
-  const extrapolatedLeft = testData[0] - extrapolateLeft(testDiffLists);
   console.log(
     "Part 2",
     data.reduce((acc, line) => {
