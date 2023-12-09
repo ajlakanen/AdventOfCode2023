@@ -3,39 +3,36 @@ const f = require("fs");
 /**
  * Get the type of a hand based on the strengths of the cards in the hand.
  * This is the core of the solution.
- * @param {Array} cardStrenghts Strengths of the cards in the hand
- * @param {Boolean} jokers      Are jokers present when calculating the hand type.
- *                              If true, jokers ('J') are treated as wildcards,
- *                              otherwise they are treated as Jacks.
- * @returns {number}            Hand type
+ * @param {Array} cardRanks   Ranks of the cards in the hand
+ * @param {Boolean} jokers    Are jokers present when calculating the hand type.
+ *                            If true, jokers ('J') are treated as wildcards,
+ *                            otherwise they are treated as Jacks.
+ * @returns {number}          Hand type
  */
-const getHandType = (cardStrenghts, jokers = false) => {
-  cardStrenghts = jokers ? cardStrenghts.filter((s) => s !== 1) : cardStrenghts;
-  const jokersAmount = jokers ? 5 - cardStrenghts.length : 0;
-  const sorted = cardStrenghts.sort((a, b) => b - a);
+const getHandType = (cardRanks, jokers = false) => {
+  cardRanks = jokers ? cardRanks.filter((s) => s !== 1) : cardRanks;
+  const jokersAmount = jokers ? 5 - cardRanks.length : 0;
+  const sorted = cardRanks.sort((a, b) => b - a);
 
   // Five of a kind (7 points)
-  const fiveOfAKind =
-    sorted.filter((strength) => strength === sorted[0]).length === 5;
+  const fiveOfAKind = sorted.filter((rank) => rank === sorted[0]).length === 5;
   if (fiveOfAKind) return 7;
 
   // Four of a kind (6 points)
-  const fourOfAKind = sorted.some((strength) => {
-    const filtered = sorted.filter((s) => s === strength);
-    return filtered.length === 4;
+  const fourOfAKind = sorted.some((rank) => {
+    return sorted.filter((s) => s === rank).length === 4;
   });
   // 4 of a kind with 1 joker is 7 points
   if (fourOfAKind && jokersAmount >= 1) return 7;
   if (fourOfAKind) return 6;
 
   // Full house (5 points)
-  const fullHouse = sorted.some((strength) => {
-    const filtered = sorted.filter((s) => s === strength);
+  const fullHouse = sorted.some((rank) => {
+    const filtered = sorted.filter((s) => s === rank);
     return (
       filtered.length === 3 &&
-      sorted.some((strength) => {
-        const filtered = sorted.filter((s) => s === strength);
-        return filtered.length === 2;
+      sorted.some((rank) => {
+        return sorted.filter((s) => s === rank).length === 2;
       })
     );
   });
@@ -43,8 +40,8 @@ const getHandType = (cardStrenghts, jokers = false) => {
   if (fullHouse) return 5;
 
   // Three of a kind (4 points)
-  const threeOfAKind = sorted.some((strength) => {
-    const filtered = sorted.filter((s) => s === strength);
+  const threeOfAKind = sorted.some((rank) => {
+    const filtered = sorted.filter((s) => s === rank);
     return filtered.length === 3;
   });
   // Three of a kind with 2 jokers can only be five of a kind (7 points).
@@ -54,8 +51,8 @@ const getHandType = (cardStrenghts, jokers = false) => {
   if (threeOfAKind) return 4;
 
   // Two pair (3 points)
-  const twoPairs = sorted.some((strength) => {
-    const firstPair = sorted.filter((s) => s === strength);
+  const twoPairs = sorted.some((rank) => {
+    const firstPair = sorted.filter((s) => s === rank);
     // remove first pair from sorted
     const whatsLeft = sorted.filter((s) => s !== firstPair[0]);
     const hasSecondPair = whatsLeft.some((ws) => {
@@ -68,9 +65,8 @@ const getHandType = (cardStrenghts, jokers = false) => {
   if (twoPairs) return 3;
 
   // One pair (2 points)
-  const onePair = sorted.some((strength) => {
-    const filtered = sorted.filter((s) => s === strength);
-    return filtered.length === 2;
+  const onePair = sorted.some((rank) => {
+    return sorted.filter((s) => s === rank).length === 2;
   });
   if (onePair && jokersAmount === 3) return 7;
   if (onePair && jokersAmount === 2) return 6;
@@ -95,9 +91,9 @@ const getHandType = (cardStrenghts, jokers = false) => {
 const compareHands = (hand1, hand2) => {
   if (hand1.type < hand2.type) return -1;
   if (hand1.type > hand2.type) return 1;
-  for (let i = 0; i < hand1.strengths.length; i++) {
-    if (hand1.strengths[i] < hand2.strengths[i]) return -1;
-    if (hand1.strengths[i] > hand2.strengths[i]) return 1;
+  for (let i = 0; i < hand1.ranks.length; i++) {
+    if (hand1.ranks[i] < hand2.ranks[i]) return -1;
+    if (hand1.ranks[i] > hand2.ranks[i]) return 1;
   }
   return 1;
 };
@@ -111,29 +107,28 @@ const part1 = () => {
   });
 
   /**
-   * Card strengths when jokers are not present
+   * Card ranks when jokers are not present
    */
-  const strengths = [
-    { card: "A", strength: 14 },
-    { card: "K", strength: 13 },
-    { card: "Q", strength: 12 },
-    { card: "J", strength: 11 },
-    { card: "T", strength: 10 },
-    { card: "9", strength: 9 },
-    { card: "8", strength: 8 },
-    { card: "7", strength: 7 },
-    { card: "6", strength: 6 },
-    { card: "5", strength: 5 },
-    { card: "4", strength: 4 },
-    { card: "3", strength: 3 },
-    { card: "2", strength: 2 },
+  const ranks = [
+    { card: "A", rank: 14 },
+    { card: "K", rank: 13 },
+    { card: "Q", rank: 12 },
+    { card: "J", rank: 11 },
+    { card: "T", rank: 10 },
+    { card: "9", rank: 9 },
+    { card: "8", rank: 8 },
+    { card: "7", rank: 7 },
+    { card: "6", rank: 6 },
+    { card: "5", rank: 5 },
+    { card: "4", rank: 4 },
+    { card: "3", rank: 3 },
+    { card: "2", rank: 2 },
   ];
 
-  const getHandStrengths = (cards) => {
-    const splitted = cards.split("").map((card) => {
-      return strengths.find((strength) => strength.card === card).strength;
+  const getRanks = (cards) => {
+    return cards.split("").map((card) => {
+      return ranks.find((rank) => rank.card === card).rank;
     });
-    return splitted;
   };
 
   const hands = lines.map((line) => {
@@ -141,8 +136,8 @@ const part1 = () => {
     return {
       cards: splitted[0],
       bid: parseInt(splitted[1]),
-      strengths: getHandStrengths(splitted[0]),
-      type: getHandType(getHandStrengths(splitted[0])),
+      ranks: getRanks(splitted[0]),
+      type: getHandType(getRanks(splitted[0])),
     };
   });
 
@@ -161,29 +156,28 @@ const part2 = () => {
   });
 
   /**
-   * Card strengths when jokers are present
+   * Card ranks when jokers are present
    */
-  const strengths = [
-    { card: "A", strength: 14 },
-    { card: "K", strength: 13 },
-    { card: "Q", strength: 12 },
-    { card: "T", strength: 10 },
-    { card: "9", strength: 9 },
-    { card: "8", strength: 8 },
-    { card: "7", strength: 7 },
-    { card: "6", strength: 6 },
-    { card: "5", strength: 5 },
-    { card: "4", strength: 4 },
-    { card: "3", strength: 3 },
-    { card: "2", strength: 2 },
-    { card: "J", strength: 1 },
+  const ranks = [
+    { card: "A", rank: 14 },
+    { card: "K", rank: 13 },
+    { card: "Q", rank: 12 },
+    { card: "T", rank: 10 },
+    { card: "9", rank: 9 },
+    { card: "8", rank: 8 },
+    { card: "7", rank: 7 },
+    { card: "6", rank: 6 },
+    { card: "5", rank: 5 },
+    { card: "4", rank: 4 },
+    { card: "3", rank: 3 },
+    { card: "2", rank: 2 },
+    { card: "J", rank: 1 },
   ];
 
-  const getCardStrengths = (cards) => {
-    const splitted = cards.split("").map((card) => {
-      return strengths.find((strength) => strength.card === card).strength;
+  const getRanks = (cards) => {
+    return cards.split("").map((card) => {
+      return ranks.find((rank) => rank.card === card).rank;
     });
-    return splitted;
   };
 
   const hands = lines.map((line) => {
@@ -191,8 +185,8 @@ const part2 = () => {
     return {
       cards: splitted[0],
       bid: parseInt(splitted[1]),
-      strengths: getCardStrengths(splitted[0]),
-      type: getHandType(getCardStrengths(splitted[0]), true),
+      ranks: getRanks(splitted[0]),
+      type: getHandType(getRanks(splitted[0]), true),
     };
   });
 
