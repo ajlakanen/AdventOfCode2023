@@ -44,8 +44,7 @@ const part1 = () => {
   };
 
   const sum = data.reduce((acc, line) => {
-    const extrapolated = line[line.length - 1] + extrapolate(diffLists(line));
-    return acc + extrapolated;
+    return acc + line[line.length - 1] + extrapolate(diffLists(line));
   }, 0);
   console.log("Part 1", sum);
 };
@@ -72,8 +71,7 @@ const part2 = () => {
   console.log(
     "Part 2",
     data.reduce((acc, line) => {
-      const extrapolatedLeft = line[0] - extrapolateLeft(diffLists(line));
-      return acc + extrapolatedLeft;
+      return acc + line[0] - extrapolateLeft(diffLists(line));
     }, 0)
   );
 };
