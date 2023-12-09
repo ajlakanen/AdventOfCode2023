@@ -32,7 +32,7 @@ const part1 = () => {
 
   const data = lines.map((line) => line.split(" ").map((n) => parseInt(n)));
 
-  const extrapolate = (diffLists) => {
+  const extrapolateRight = (diffLists) => {
     let result = [...diffLists];
     for (let i = diffLists.length - 2; i >= 0; i--) {
       const last = result[i][result[i].length - 1];
@@ -43,7 +43,7 @@ const part1 = () => {
   };
 
   const sum = data.reduce((acc, line) => {
-    return acc + line[line.length - 1] + extrapolate(diffLists(line));
+    return acc + line[line.length - 1] + extrapolateRight(diffLists(line));
   }, 0);
   console.log("Part 1", sum);
 };
