@@ -1,5 +1,4 @@
 const f = require("fs");
-const { default: test } = require("node:test");
 
 /**
  * Returns a sequence of differences between numbers in the input array.
