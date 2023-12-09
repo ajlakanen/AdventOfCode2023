@@ -152,6 +152,8 @@ const part2 = () => {
     })
     .slice(1);
 
+  console.log("mapGroups", mapGroups);
+
   // [<--MAP-->]
   //             [<--VALUES-->]
   // or
@@ -261,9 +263,11 @@ const part2 = () => {
           tailOfMapGroups
         );
 
+        if (values.length - head.length < 0) console.log("ZERO LENGTH");
         const tail = mapRangeMin(
           {
-            start: values.start + map.length - diff,
+            // start: values.start + map.length - diff,
+            start: map.in + map.length,
             length: values.length - head.length,
           },
           mapGroups
@@ -280,6 +284,7 @@ const part2 = () => {
           },
           mapGroups
         );
+        if (values.length - head.length < 0) console.log("ZERO LENGTH");
         const tail = mapRangeMin(
           {
             start: map.out,
@@ -302,6 +307,7 @@ const part2 = () => {
           mapGroups
         );
 
+        if (values.length - head.length < 0) console.log("ZERO LENGTH");
         const tail = mapRangeMin(
           {
             start: map.in,
