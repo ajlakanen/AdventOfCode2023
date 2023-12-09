@@ -1,4 +1,28 @@
 const f = require("fs");
+const { default: test } = require("node:test");
+
+/**
+ * Returns a sequence of differences between numbers in the input array.
+ * The sequence is repeated until all numbers are equal.
+ * @param {Array} array Sequence of numbers
+ * @returns [Array] Sequence of differences between numbers in the input array
+ */
+const diffLists = (array) => {
+  let diffs = [];
+  let arrayCount = 0;
+  while (true) {
+    if (diffs.length > 0 && diffs[diffs.length - 1].every((n) => n === 0))
+      break;
+    const previous = arrayCount === 0 ? array : diffs[diffs.length - 1];
+    let diffNow = [];
+    for (let i = 0; i < previous.length - 1; i++) {
+      diffNow.push(previous[i + 1] - previous[i]);
+    }
+    diffs.push(diffNow);
+    arrayCount++;
+  }
+  return diffs;
+};
 
 const part1 = () => {
   let lines = [];
@@ -8,24 +32,6 @@ const part1 = () => {
   });
 
   const data = lines.map((line) => line.split(" ").map((n) => parseInt(n)));
-
-  const diffLists = (array) => {
-    let diffs = [];
-    let arrayCount = 0;
-    while (true) {
-      if (diffs.length > 0 && diffs[diffs.length - 1].every((n) => n === 0))
-        break;
-      const previous = arrayCount === 0 ? array : diffs[diffs.length - 1];
-      let diffNow = [];
-      //console.log("ok");
-      for (let i = 0; i < previous.length - 1; i++) {
-        diffNow.push(previous[i + 1] - previous[i]);
-      }
-      diffs.push(diffNow);
-      arrayCount++;
-    }
-    return diffs;
-  };
 
   const extrapolate = (diffLists) => {
     let result = [...diffLists];
@@ -41,16 +47,44 @@ const part1 = () => {
     const extrapolated = line[line.length - 1] + extrapolate(diffLists(line));
     return acc + extrapolated;
   }, 0);
-  console.log(sum);
+  console.log("Part 1", sum);
 
   for (let i = 0; i < data.length; i++) {
     const line = data[i];
     const extrapolated = line[line.length - 1] + extrapolate(diffLists(line));
-    //console.log(extrapolated);
   }
-  // console.log(diffLists(data[2]));
-  // console.log(data[2][data[2].length - 1] + extrapolate(diffLists(data[2])));
-  // console.log("data", data);
+};
+
+const part2 = () => {
+  let lines = [];
+  const rawData = f.readFileSync("data/09-data.txt", "utf-8");
+  rawData.split(/\r?\n/).forEach((line) => {
+    lines.push(line);
+  });
+
+  const data = lines.map((line) => line.split(" ").map((n) => parseInt(n)));
+
+  const extrapolateLeft = (diffLists) => {
+    let result = [...diffLists];
+    for (let i = diffLists.length - 2; i >= 0; i--) {
+      const first = result[i][0];
+      const previous = result[i + 1][0];
+      result[i].unshift(first - previous);
+    }
+    return result[0][0];
+  };
+
+  const testData = data[2];
+  const testDiffLists = diffLists(testData);
+  const extrapolatedLeft = testData[0] - extrapolateLeft(testDiffLists);
+  console.log(
+    "Part 2",
+    data.reduce((acc, line) => {
+      const extrapolatedLeft = line[0] - extrapolateLeft(diffLists(line));
+      return acc + extrapolatedLeft;
+    }, 0)
+  );
 };
 
 part1();
+part2();
