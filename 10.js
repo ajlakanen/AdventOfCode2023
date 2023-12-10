@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, writeFile } from "fs";
 
 const findStartPos = (lines) => {
   let i = 0;
@@ -71,7 +71,7 @@ const nextLocation = ({ y, x }, lines, from) => {
     newDir: newDir,
   };
 
-  console.log("newPos", newPos);
+  //console.log("newPos", newPos);
   return newPos;
 };
 
@@ -102,37 +102,78 @@ const part1 = () => {
     lines.push(line);
   });
 
+  // prettier-ignore
+  // lines = [
+  //   ".....",
+  //   ".F-7.",
+  //   ".S.|.",
+  //   ".L-J.",
+  //   ".....",
+  //   ];
+  //
+  // // prettier-ignore
+  // lines = [
+  //    "7-F7-",
+  //    ".FJ|7",
+  //    "SJLL7",
+  //    "|F--J",
+  //    "LJ.LJ",];
+
   const startPos = findStartPos(lines);
 
   const connections = getConnections(startPos, lines);
   let prevDir = connections[0];
   let connectionDirection = cardinalOpposites[prevDir];
-  let y = startPos.x + cardinals[prevDir][0];
-  let x = startPos.y + cardinals[prevDir][1];
+  let x = startPos.x + cardinals[prevDir][0];
+  let y = startPos.y + cardinals[prevDir][1];
   const firstPipeAfterStart = { y: x, x: y };
-  console.log("startPos", startPos);
-  console.log("startPos connections", connections);
-  console.log("firstConnection", prevDir);
-  console.log("firstConnectionDirection", connectionDirection);
-  console.log("firstPipeAfterStart", firstPipeAfterStart);
+  //console.log("startPos", startPos);
+  //console.log("startPos connections", connections);
+  //console.log("firstConnection", prevDir);
+  //console.log("firstConnectionDirection", connectionDirection);
+  //console.log("firstPipeAfterStart", firstPipeAfterStart);
 
   const connections2 = getConnectedCardinals(
     { y: x, x: y },
     connectionDirection,
     lines
   );
-  console.log("connections2", connections2);
+  //console.log("connections2", connections2);
+
+  // Create new 10 x 10 array with all dots
+  let resultLines = [];
+  for (let i = 0; i < lines.length; i++) {
+    resultLines[i] = []; // Initialize a new row
+    for (let j = 0; j < lines[0].length; j++) {
+      resultLines[i][j] = "."; // Fill each cell in the row with a dot
+    }
+  }
+
+  //let resultLines = Array.fill
+  console.log("resultLines", resultLines);
 
   let i = 1;
   //let {newY, newX} = firstPipeAfterStart;
   while (true) {
-    const { newY, newX, newDir } = nextLocation({ y: x, x: y }, lines, prevDir);
+    resultLines[y][x] = "X";
+    const { newY, newX, newDir } = nextLocation({ y, x }, lines, prevDir);
     x = newX;
     y = newY;
     prevDir = newDir;
-    if (lines[x][y] === "S") break;
-    else i++;
+    if (lines[y][x] === "S") break;
+    else {
+      //console.log(resultLines.map((line) => line.join("")).join("\n"), "\n");
+      //console.clear();
+      i++;
+    }
   }
+  console.log(resultLines.map((line) => line.join("")).join("\n"));
+  console.clear();
+  console.log("i", i, "i/2", i / 2);
+
+  writeFile("data/10-result.txt", resultLines.join("\n"), (err) => {
+    if (err) throw err;
+  });
 };
 
 part1();
