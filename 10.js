@@ -18,20 +18,20 @@ const pipes = {
   F: ["S", "E"],
 };
 
-const checkDirection = (pipe, from) => {
-  return pipe.connects.indexOf(from) > -1;
+const canConnect = (pipe, from) => {
+  return pipes[pipe].indexOf(from) > -1;
 };
 
 const checkConnections = ([nesw]) => {
   let connections = [];
   // north
-  checkDirection(nesw[0], "S") ? connections.push(1) : connections.push(0);
+  canConnect(nesw[0], "S") ? connections.push(1) : connections.push(0);
   // east
-  checkDirection(nesw[1], "W") ? connections.push(1) : connections.push(0);
+  canConnect(nesw[1], "W") ? connections.push(1) : connections.push(0);
   // south
-  checkDirection(nesw[2], "N") ? connections.push(1) : connections.push(0);
+  canConnect(nesw[2], "N") ? connections.push(1) : connections.push(0);
   // west
-  checkDirection(nesw[3], "E") ? connections.push(1) : connections.push(0);
+  canConnect(nesw[3], "E") ? connections.push(1) : connections.push(0);
 
   return connections;
 };
@@ -58,4 +58,4 @@ const part1 = () => {
 
 part1();
 
-export { checkDirection };
+export { canConnect, checkConnections, pipes };
