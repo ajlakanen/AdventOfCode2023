@@ -1,9 +1,9 @@
-import {
+const {
   canConnect,
-  getConnectedCardinals,
-  getConnections,
   pipes,
-} from "./10.js";
+  getConnections,
+  getConnectedCardinals,
+} = require("./10.js");
 
 const pipe1 = "L";
 const from1 = "N";

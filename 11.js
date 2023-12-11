@@ -1,3 +1,5 @@
+const f = require("fs");
+
 const part1 = () => {
   let lines = [];
 
