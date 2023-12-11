@@ -49,7 +49,7 @@ const emptyRowsAndColumns = (lines) => {
   return { emptyRows, emptyColumns };
 };
 
-const distance2 = (a, b, emptyRowsAndColumns, dist) => {
+const distance = (a, b, emptyRowsAndColumns, dist) => {
   const minX = Math.min(a.x, b.x);
   const maxX = Math.max(a.x, b.x);
   const minY = Math.min(a.y, b.y);
@@ -103,14 +103,11 @@ const part1 = () => {
     lines.push(line);
   });
 
-  // lines = expandEmptyRowsAndColumns(lines);
   const empty = emptyRowsAndColumns(lines);
-
   const galaxies = parseGalaxies(lines);
   const distances = distancesToOtherGalaxies(galaxies, (a, b) =>
-    distance2(a, b, empty, 2)
+    distance(a, b, empty, 2)
   );
-
   console.log(distances.flat().reduce((a, b) => a + b.distance, 0));
 };
 
@@ -125,7 +122,7 @@ const part2 = () => {
   const galaxies = parseGalaxies(lines);
   const empty = emptyRowsAndColumns(lines);
   const distances = distancesToOtherGalaxies(galaxies, (a, b) =>
-    distance2(a, b, empty, 1000000)
+    distance(a, b, empty, 1000000)
   );
   console.log(distances.flat().reduce((a, b) => a + b.distance, 0));
 };
