@@ -25,6 +25,7 @@ const parsePatterns = (lines) => {
 };
 
 const stringIsMirroredAtIndex = (string, index) => {
+  if (index === 0 || index === string.length - 1) return false;
   // Check if the string is mirrored at the given index
 
   // Distance from the "focal point" of the mirror
@@ -47,11 +48,18 @@ const hasVerticalMirror = (pattern) => {
     // If consecutive characters are the same,
     // it makes this a potential focal point of the mirror
     if (pattern[0][x] === pattern[0][x - 1]) {
-      let hasMirror = true;
+      const distToEdge = Math.min(x, pattern[0].length - x - 1);
+      if (distToEdge < 2) {
+        x++;
+        continue;
+      }
+
       // Check if the other rows are mirrored at the same previously found index
       let y = 1;
+      let hasMirror = true;
       while (y < pattern.length) {
-        if (!stringIsMirroredAtIndex(pattern[y], x)) {
+        const subString = pattern[y].substring(x - distToEdge, x + distToEdge);
+        if (!stringIsMirroredAtIndex(subString, x)) {
           hasMirror = false;
           break;
         }
@@ -70,14 +78,21 @@ const hasHorizontalMirror = (pattern) => {
     // If this and previous column has the same character,
     // it makes this a potential focal point of the mirror
     if (pattern[y][0] === pattern[y - 1][0]) {
-      let hasMirror = true;
+      const distToEdge = Math.min(y, pattern.length - y - 1);
+      if (distToEdge < 2) {
+        y++;
+        continue;
+      }
+
       // Check if the other columns are mirrored at the same previously found index
       let x = 1;
+      let hasMirror = true;
+
       while (x < pattern[0].length) {
         // Concatenate the column of each row to a string
-
         const column = pattern.map((row) => row[x]).join("");
-        if (!stringIsMirroredAtIndex(column, y)) {
+        const subString = column.substring(y - distToEdge, y + distToEdge);
+        if (!stringIsMirroredAtIndex(subString, y)) {
           hasMirror = false;
           break;
         }
@@ -93,12 +108,6 @@ const hasHorizontalMirror = (pattern) => {
 const part1 = () => {
   const patterns = parsePatterns(lines);
 
-  //console.log(patterns);
-  console.log("patterns[0] vertical", hasVerticalMirror(patterns[0]));
-  console.log("patterns[1] vertical", hasVerticalMirror(patterns[1]));
-  console.log("patterns[0] horizontal", hasHorizontalMirror(patterns[0]));
-  console.log("patterns[1] horizontal", hasHorizontalMirror(patterns[1]));
-
   // prettier-ignore
   let pattern = [
     "#...",
@@ -106,8 +115,36 @@ const part1 = () => {
     ".#.#",
     "..#.",
   ];
-  console.log("pattern ", hasVerticalMirror(pattern));
-  console.log("pattern ", hasHorizontalMirror(pattern));
+
+  // prettier-ignore
+  let pattern2 = [
+  '..#..#..##..#..#.',
+  '.######.#.....##.',
+  '###..###..##....#',
+  '#.#..#.##.#...###',
+  '#.#..#.##.#...###',
+  '###..###..##....#',
+  '.######.#.....##.',
+  '..#..#..##..#..##',
+  '.#....#.###.#####',
+  '###..###.#..##..#',
+  '#.####.##..##....',
+  '###..#####.##...#',
+  '..####.....#####.',
+  '.#....#..#.#.##..',
+  '.######.#..#.#.#.'];
+
+  // console.log(hasVerticalMirror(pattern));
+  // console.log(hasHorizontalMirror(pattern));
+  console.log(hasHorizontalMirror(pattern2));
+  console.log(hasVerticalMirror(pattern2));
+
+  patterns.map((pattern, index) => {
+    //console.log("pattern", index, pattern);
+    //console.log(hasVerticalMirror(pattern));
+    //console.log(hasHorizontalMirror(pattern));
+    //console.log();
+  });
 
   const verticalMirrorsSum = patterns
     .map(hasVerticalMirror)
@@ -119,6 +156,7 @@ const part1 = () => {
     .map(hasHorizontalMirror)
     .filter((x) => x !== -1)
     .reduce((acc, now) => acc + now * 100, 0);
+  console.log(horizontalMirrorsSum);
   console.log(verticalMirrorsSum + horizontalMirrorsSum);
 };
 
