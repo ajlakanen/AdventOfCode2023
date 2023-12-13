@@ -7,7 +7,6 @@ const part1 = () => {
   data.split(/\r?\n/).forEach((line) => {
     lines.push(line);
   });
-  // console.log(lines);
 
   const tree = lines.splice(2).reduce((acc, line) => {
     const [key, value] = line
@@ -19,8 +18,6 @@ const part1 = () => {
       [key]: { left: value[0], right: value[1] },
     };
   }, []);
-
-  // console.log(tree);
 
   /**
    * Find the ZZZ node recursively. This is too slow for the real input but I
@@ -127,10 +124,6 @@ const part2 = () => {
   });
 
   console.log(countsToReachZ.flat());
-
-  // }
-  //console.log(counts);
-  //console.log(nodesNow, i);
 };
 
 part1();
