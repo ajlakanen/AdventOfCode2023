@@ -2,13 +2,12 @@ const f = require("fs");
 
 const smallData = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
 const bigData = f.readFileSync("data/15-data.txt", "utf-8");
-const data = smallData.split(",");
+const data = bigData.split(",");
 
 const hash = (str) => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash += str.charCodeAt(i);
-    //console.log(str.charCodeAt(i));
     hash *= 17;
     hash = hash % 256;
   }
@@ -39,14 +38,20 @@ const part2 = () => {
           (item) => item.split("=")[0] === name
         )[0];
         const indexToReplace = boxes[box].indexOf(toReplace);
-        console.log(boxes[box], toReplace, indexToReplace);
+        // console.log(boxes[box], toReplace, indexToReplace);
         boxes[box][indexToReplace] = data[i];
         continue;
       }
       boxes[box] = [...boxes[box], data[i]];
     }
   }
-  console.log(boxes);
+  let sum = 0;
+  for (let i = 0; i < boxes.length; i++) {
+    for (let j = 0; j < boxes[i].length; j++) {
+      sum += (i + 1) * (j + 1) * boxes[i][j].split("=")[1];
+    }
+  }
+  console.log(sum);
 };
 
 part1();
