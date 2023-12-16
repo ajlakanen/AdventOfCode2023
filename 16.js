@@ -1,7 +1,7 @@
 const f = require("fs");
 
 const lines = f
-  .readFileSync("data/16-data-small.txt", "utf-8")
+  .readFileSync("data/16-data.txt", "utf-8")
   .split(/\r?\n/)
   .map((line) => {
     return line;
@@ -31,72 +31,62 @@ const combineLists = (list1, list2) => {
 };
 
 const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
-  let energiz = Array(map.length).fill("");
-  for (let i = 0; i < map.length; i++) {
-    energiz[i] = Array(map[0].length).fill(".");
-  }
-
-  energizedPositions.forEach((pos) => {
-    energiz[pos.y][pos.x] = "#";
-  });
-  energiz.forEach((line) => console.log(line.join("")));
+  // console.log(energizedPositions.length);
 
   const newX = posX + dirX;
   const newY = posY + dirY;
 
   if (!insideMap({ x: newX, y: newY })) {
-    return { inside: false, energizedPositions };
+    return { inside: false, energizedPositions: [...energizedPositions] };
   }
 
-  if (!inArray({ x: newX, y: newY }, energizedPositions)) {
+  const isInArray = inArray({ x: newX, y: newY }, energizedPositions);
+  if (!isInArray) {
     energizedPositions.push({
       x: newX,
       y: newY,
     });
-  } else {
-    return energized(
-      map,
-      { posX: newX, posY: newY },
-      { dirX, dirY },
-      energizedPositions
-    );
-  }
+  } /*else {
+    return energized(map, { posX: newX, posY: newY }, { dirX, dirY }, [
+      ...energizedPositions,
+    ]);
+  }*/
 
-  console.log(newY, newX, energizedPositions.length);
+  //console.log(newY, newX, energizedPositions.length);
 
   const newChar = map[newY][newX];
   if (newChar === ".") {
-    return energized(
-      map,
-      { posX: newX, posY: newY },
-      { dirX, dirY },
-      energizedPositions
-    );
+    return energized(map, { posX: newX, posY: newY }, { dirX, dirY }, [
+      ...energizedPositions,
+    ]);
   }
 
-  if (newChar === "-") {
-    // TODO!!! Split only when coming from up or down
+  if (newChar === "-" && dirX === 0 && !isInArray) {
     const left = energized(
       map,
       { posX: newX, posY: newY },
       { dirX: -1, dirY: 0 },
-      energizedPositions
+      [...energizedPositions]
     );
     const right = energized(
       map,
       { posX: newX, posY: newY },
       { dirX: 1, dirY: 0 },
-      energizedPositions
+      [...energizedPositions]
     );
     energizedPositions = combineLists(
-      left.energizedPositions,
-      right.energizedPositions
+      [...left.energizedPositions],
+      [...right.energizedPositions]
     );
-    return { inside: left.inside || right.inside, energizedPositions };
+    if (left.inside || right.inside) console.log("PROBLEMinside");
+
+    return {
+      inside: left.inside || right.inside,
+      energizedPositions: [...energizedPositions],
+    };
   }
 
   if (newChar === "\\") {
-    console.log("backslash");
     let newDirX = 0;
     let newDirY = 0;
     if (dirY === -1) newDirX = -1;
@@ -107,72 +97,74 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       map,
       { posX: newX, posY: newY },
       { dirX: newDirX, dirY: newDirY },
-      energizedPositions
+      [...energizedPositions]
     );
   }
-  if (newChar === "/") {
-    // const newDirX = dirY > 0 ? -1 : 1; // going down (y>0), go left (x<0)
-    // const newDirY = dirX > 0 ? -1 : 1; // going right (x>0), go up (y>0)
 
+  if (newChar === "/") {
+    //console.log("slash", posY, posX, newY, newX, dirY, dirX);
     let newDirX = 0;
     let newDirY = 0;
-    if (dirY === 1) newDirX = -1; // going down (y>0) // go left (x<0)
-    else if (dirY === -1) newDirX = 1; // going up (y<0) // go right (x>0)
-    if (dirX === 1) newDirY = -1; // going right (x>0) // go up (y<0)
-    else if (dirX === -1) newDirY = 1; // going left (x<0) // go down (y>0)
+    if (dirY === 1) newDirX = -1; // going down (y>0) // // go left (x<0)
+    else if (dirY === -1) newDirX = 1; // going up // (y<0) // go right (x>0)
+    if (dirX === 1) newDirY = -1; // going right (x>0) // // go up (y<0)
+    else if (dirX === -1) newDirY = 1; // going left // (x<0) // go down (y>0)
 
     return energized(
       map,
       { posX: newX, posY: newY },
       { dirX: newDirX, dirY: newDirY },
-      energizedPositions
+      [...energizedPositions]
     );
   }
-  if (newChar === "|") {
-    // TODO!!! Split only when coming from left or right
+
+  if (newChar === "|" && dirY === 0 && !isInArray) {
     const up = energized(
       map,
       { posX: newX, posY: newY },
       { dirX: 0, dirY: -1 },
-      energizedPositions
+      [...energizedPositions]
     );
     const down = energized(
       map,
       { posX: newX, posY: newY },
       { dirX: 0, dirY: 1 },
-      energizedPositions
+      [...energizedPositions]
     );
     energizedPositions = combineLists(
-      up.energizedPositions,
-      down.energizedPositions
+      [...up.energizedPositions],
+      [...down.energizedPositions]
     );
-    return { inside: up.inside || down.inside, energizedPositions };
-  }
 
-  return { inside: false, energizedPositions };
+    if (up.inside || down.inside) console.log("PROBLEMinside");
+    return {
+      inside: up.inside || down.inside,
+      energizedPositions: [...energizedPositions],
+    };
+  }
+  return energized(map, { posX: newX, posY: newY }, { dirX, dirY }, [
+    ...energizedPositions,
+  ]);
+  // return { inside: false, energizedPositions };
 };
 
 const part1 = () => {
   const energizedPositions = [];
-  console.log(
-    energized(
-      lines,
-      { posX: -1, posY: 0 },
-      { dirX: 1, dirY: 0 },
-      energizedPositions
-    )
+  const energiz = energized(
+    lines,
+    { posX: -1, posY: 0 },
+    { dirX: 1, dirY: 0 },
+    [...energizedPositions]
   );
-  console.log(energizedPositions.length);
 
-  let energiz = Array(lines.length).fill("");
-  for (let i = 0; i < lines.length; i++) {
-    energiz[i] = Array(lines[0].length).fill(".");
-  }
+  console.log(energiz);
+  console.log(energiz.energizedPositions.length);
 
-  energizedPositions.forEach((pos) => {
-    energiz[pos.y][pos.x] = "#";
+  let energiz2 = lines.map((line) => [...line]);
+  energiz.energizedPositions.forEach((pos) => {
+    energiz2[pos.y][pos.x] = "#";
   });
-  energiz.forEach((line) => console.log(line.join("")));
+  energiz2.forEach((line) => console.log(line.join("")));
 };
 
 part1();
