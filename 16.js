@@ -1,7 +1,7 @@
 const f = require("fs");
 
 const lines = f
-  .readFileSync("data/16-data.txt", "utf-8")
+  .readFileSync("data/16-data-small.txt", "utf-8")
   .split(/\r?\n/)
   .map((line) => {
     return line;
@@ -15,7 +15,8 @@ const inArray = ({ x, y }, arr) => {
   return arr.filter((item) => item.x === x && item.y === y).length > 0;
 };
 
-const combineLists = (list1, list2) => {
+const combineLists = ({ list1, list2 }) => {
+  // console.log(list1);
   const combined = [];
   list1.forEach((item) => {
     if (!inArray(item, combined)) {
@@ -37,7 +38,7 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
   const newY = posY + dirY;
 
   if (!insideMap({ x: newX, y: newY })) {
-    return { inside: false, energizedPositions: [...energizedPositions] };
+    return energizedPositions;
   }
 
   const isInArray = inArray({ x: newX, y: newY }, energizedPositions);
@@ -74,16 +75,10 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       { dirX: 1, dirY: 0 },
       [...energizedPositions]
     );
-    energizedPositions = combineLists(
-      [...left.energizedPositions],
-      [...right.energizedPositions]
-    );
+    energizedPositions = combineLists({ list1: left, list2: right });
     if (left.inside || right.inside) console.log("PROBLEMinside");
 
-    return {
-      inside: left.inside || right.inside,
-      energizedPositions: [...energizedPositions],
-    };
+    return energizedPositions;
   }
 
   if (newChar === "\\") {
@@ -131,21 +126,21 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       { dirX: 0, dirY: 1 },
       [...energizedPositions]
     );
-    energizedPositions = combineLists(
-      [...up.energizedPositions],
-      [...down.energizedPositions]
-    );
+
+    energizedPositions = combineLists({ list1: up, list2: down });
 
     if (up.inside || down.inside) console.log("PROBLEMinside");
-    return {
-      inside: up.inside || down.inside,
-      energizedPositions: [...energizedPositions],
-    };
+    return energizedPositions;
   }
-  return energized(map, { posX: newX, posY: newY }, { dirX, dirY }, [
-    ...energizedPositions,
-  ]);
-  // return { inside: false, energizedPositions };
+
+  // console.log("when do we get here?");
+  return energized(
+    map,
+    { posX: newX, posY: newY },
+    { dirX, dirY },
+    energizedPositions
+  );
+  return energizedPositions;
 };
 
 const part1 = () => {
@@ -158,10 +153,10 @@ const part1 = () => {
   );
 
   console.log(energiz);
-  console.log(energiz.energizedPositions.length);
+  console.log(energiz.length);
 
   let energiz2 = lines.map((line) => [...line]);
-  energiz.energizedPositions.forEach((pos) => {
+  energiz.forEach((pos) => {
     energiz2[pos.y][pos.x] = "#";
   });
   energiz2.forEach((line) => console.log(line.join("")));
