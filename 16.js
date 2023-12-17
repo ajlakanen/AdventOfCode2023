@@ -1,7 +1,7 @@
 const f = require("fs");
 
 const lines = f
-  .readFileSync("data/16-data-small.txt", "utf-8")
+  .readFileSync("data/16-data.txt", "utf-8")
   .split(/\r?\n/)
   .map((line) => {
     return line;
@@ -144,11 +144,56 @@ const part2 = () => {
       { dirX: 0, dirY: 1 },
       [...energizedPositions]
     );
+    console.log(energiz.length);
     map.push({ x: i, y: -1, energized: energiz.length });
   }
-  map.map((row) => {
-    console.log(row);
-  });
+
+  // bottom row
+  for (let i = 0; i < lines[0].length; i++) {
+    const energizedPositions = [];
+    const energiz = energized(
+      lines,
+      { posX: i, posY: lines.length },
+      { dirX: 0, dirY: -1 },
+      [...energizedPositions]
+    );
+    console.log(energiz.length);
+    map.push({ x: i, y: lines.length, energized: energiz.length });
+  }
+
+  // from left to right
+  for (let i = 0; i < lines.length; i++) {
+    const energizedPositions = [];
+    const energiz = energized(
+      lines,
+      { posX: -1, posY: i },
+      { dirX: 1, dirY: 0 },
+      [...energizedPositions]
+    );
+    console.log(energiz.length);
+    map.push({ x: -1, y: i, energized: energiz.length });
+  }
+
+  // from right to left
+  for (let i = 0; i < lines.length; i++) {
+    const energizedPositions = [];
+    const energiz = energized(
+      lines,
+      { posX: lines[0].length, posY: i },
+      { dirX: -1, dirY: 0 },
+      [...energizedPositions]
+    );
+    console.log(energiz.length);
+    map.push({ x: lines[0].length, y: i, energized: energiz.length });
+  }
+
+  map
+    .sort((a, b) => {
+      return a.energized - b.energized;
+    })
+    .map((row) => {
+      console.log(row);
+    });
 };
 
 part1();
