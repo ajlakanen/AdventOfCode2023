@@ -1,7 +1,7 @@
 const f = require("fs");
 
 const lines = f
-  .readFileSync("data/16-data.txt", "utf-8")
+  .readFileSync("data/16-data-small.txt", "utf-8")
   .split(/\r?\n/)
   .map((line) => {
     return line;
@@ -133,4 +133,23 @@ const part1 = () => {
   console.log(energiz.length);
 };
 
+const part2 = () => {
+  let map = [];
+  // top row
+  for (let i = 0; i < lines[0].length; i++) {
+    const energizedPositions = [];
+    const energiz = energized(
+      lines,
+      { posX: i, posY: -1 },
+      { dirX: 0, dirY: 1 },
+      [...energizedPositions]
+    );
+    map.push({ x: i, y: -1, energized: energiz.length });
+  }
+  map.map((row) => {
+    console.log(row);
+  });
+};
+
 part1();
+part2();
