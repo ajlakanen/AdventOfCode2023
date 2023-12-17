@@ -16,7 +16,6 @@ const inArray = ({ x, y }, arr) => {
 };
 
 const combineLists = ({ list1, list2 }) => {
-  // console.log(list1);
   const combined = [];
   list1.forEach((item) => {
     if (!inArray(item, combined)) {
@@ -107,7 +106,6 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       energizedPositions
     );
     energizedPositions = combineLists({ list1: left, list2: right });
-    if (left.inside || right.inside) console.log("PROBLEMinside");
 
     return energizedPositions;
   }
@@ -133,7 +131,6 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
 
     energizedPositions = combineLists({ list1: up, list2: down });
 
-    if (up.inside || down.inside) console.log("PROBLEMinside");
     return energizedPositions;
   }
 
@@ -149,14 +146,7 @@ const part1 = () => {
     [...energizedPositions]
   );
 
-  console.log(energiz);
   console.log(energiz.length);
-
-  let energiz2 = lines.map((line) => [...line]);
-  energiz.forEach((pos) => {
-    energiz2[pos.y][pos.x] = "#";
-  });
-  energiz2.forEach((line) => console.log(line.join("")));
 };
 
 part1();
