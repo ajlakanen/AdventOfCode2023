@@ -88,11 +88,14 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
 
   const isInArray = inArray({ x: newX, y: newY }, energizedPositions);
 
-  if (newChar === "-" && dirX === 0 && !isInArray) {
+  if (!isInArray) {
     energizedPositions.push({
       x: newX,
       y: newY,
     });
+  }
+
+  if (newChar === "-" && dirX === 0 && !isInArray) {
     const left = energized(
       map,
       { posX: newX, posY: newY },
@@ -106,16 +109,10 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       energizedPositions
     );
     energizedPositions = combineLists({ list1: left, list2: right });
-
     return energizedPositions;
   }
 
   if (newChar === "|" && dirY === 0 && !isInArray) {
-    energizedPositions.push({
-      x: newX,
-      y: newY,
-    });
-
     const up = energized(
       map,
       { posX: newX, posY: newY },
@@ -130,7 +127,6 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
     );
 
     energizedPositions = combineLists({ list1: up, list2: down });
-
     return energizedPositions;
   }
 
