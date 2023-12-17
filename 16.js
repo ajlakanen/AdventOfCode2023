@@ -1,4 +1,3 @@
-const { dir } = require("console");
 const f = require("fs");
 
 const lines = f
@@ -39,10 +38,8 @@ const charNeedsRecursion = (char, dirX, dirY) => {
 };
 
 const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
-  // console.log(energizedPositions.length);
-
-  let newX = posX; // + dirX;
-  let newY = posY; // + dirY;
+  let newX = posX;
+  let newY = posY;
 
   let newChar = "";
 
@@ -53,7 +50,6 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       return energizedPositions;
     }
     newChar = map[newY][newX];
-    //console.log("y", newY, "x", newX, newChar, dirX, dirY);
     if (charNeedsRecursion(newChar, dirX, dirY)) {
       break;
     }
@@ -102,13 +98,13 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       map,
       { posX: newX, posY: newY },
       { dirX: -1, dirY: 0 },
-      [...energizedPositions]
+      energizedPositions
     );
     const right = energized(
       map,
       { posX: newX, posY: newY },
       { dirX: 1, dirY: 0 },
-      [...energizedPositions]
+      energizedPositions
     );
     energizedPositions = combineLists({ list1: left, list2: right });
     if (left.inside || right.inside) console.log("PROBLEMinside");
@@ -126,13 +122,13 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       map,
       { posX: newX, posY: newY },
       { dirX: 0, dirY: -1 },
-      [...energizedPositions]
+      energizedPositions
     );
     const down = energized(
       map,
       { posX: newX, posY: newY },
       { dirX: 0, dirY: 1 },
-      [...energizedPositions]
+      energizedPositions
     );
 
     energizedPositions = combineLists({ list1: up, list2: down });
@@ -141,13 +137,6 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
     return energizedPositions;
   }
 
-  //console.log("when do we get here?");
-  //return energized(
-  //  map,
-  //  { posX: newX, posY: newY },
-  //  { dirX, dirY },
-  //  energizedPositions
-  //);
   return energizedPositions;
 };
 
