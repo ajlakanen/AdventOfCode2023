@@ -2,7 +2,7 @@ const { dir } = require("console");
 const f = require("fs");
 
 const lines = f
-  .readFileSync("data/16-data-small.txt", "utf-8")
+  .readFileSync("data/16-data.txt", "utf-8")
   .split(/\r?\n/)
   .map((line) => {
     return line;
@@ -41,30 +41,28 @@ const charNeedsRecursion = (char, dirX, dirY) => {
 const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
   // console.log(energizedPositions.length);
 
-  let newX = posX;
-  let newY = posY;
+  let newX = posX; // + dirX;
+  let newY = posY; // + dirY;
 
-  // if (!insideMap({ x: newX, y: newY })) {
-  //   return energizedPositions;
-  // }
-
-  let newChar = map[newY][newX];
+  let newChar = "";
 
   while (true) {
     newX += dirX;
     newY += dirY;
-    newChar = map[newY][newX];
     if (!insideMap({ x: newX, y: newY })) {
       return energizedPositions;
     }
-    if (!isInArray({ x: newX, y: newY }, energizedPositions)) {
+    newChar = map[newY][newX];
+    //console.log("y", newY, "x", newX, newChar, dirX, dirY);
+    if (charNeedsRecursion(newChar, dirX, dirY)) {
+      break;
+    }
+
+    if (!inArray({ x: newX, y: newY }, energizedPositions)) {
       energizedPositions.push({
         x: newX,
         y: newY,
       });
-    }
-    if (charNeedsRecursion(newChar, dirX, dirY)) {
-      break;
     }
 
     if (newChar === ".") {
@@ -93,17 +91,13 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
     }
   }
 
-  /*else {
-    return energized(map, { posX: newX, posY: newY }, { dirX, dirY }, [
-      ...energizedPositions,
-    ]);
-  }*/
-
-  //console.log(newY, newX, energizedPositions.length);
-
-  // const newChar = map[newY][newX];
+  const isInArray = inArray({ x: newX, y: newY }, energizedPositions);
 
   if (newChar === "-" && dirX === 0 && !isInArray) {
+    energizedPositions.push({
+      x: newX,
+      y: newY,
+    });
     const left = energized(
       map,
       { posX: newX, posY: newY },
@@ -123,6 +117,11 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
   }
 
   if (newChar === "|" && dirY === 0 && !isInArray) {
+    energizedPositions.push({
+      x: newX,
+      y: newY,
+    });
+
     const up = energized(
       map,
       { posX: newX, posY: newY },
@@ -142,13 +141,13 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
     return energizedPositions;
   }
 
-  // console.log("when do we get here?");
-  return energized(
-    map,
-    { posX: newX, posY: newY },
-    { dirX, dirY },
-    energizedPositions
-  );
+  //console.log("when do we get here?");
+  //return energized(
+  //  map,
+  //  { posX: newX, posY: newY },
+  //  { dirX, dirY },
+  //  energizedPositions
+  //);
   return energizedPositions;
 };
 
