@@ -60,27 +60,18 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       });
     }
 
-    if (newChar === ".") {
-      continue;
-    }
+    if (newChar === ".") continue;
+
     if (newChar === "\\") {
-      let newDirX = 0;
-      let newDirY = 0;
-      if (dirY === -1) newDirX = -1;
-      else if (dirY === 1) newDirX = 1;
-      if (dirX === 1) newDirY = 1; // going right (x>0) // go up (y<0)
-      else if (dirX === -1) newDirY = -1; // going left (x<0) // go down (y>0)
+      const newDirX = dirY === -1 ? -1 : dirY === 1 ? 1 : 0;
+      const newDirY = dirX === 1 ? 1 : dirX === -1 ? -1 : 0;
       dirX = newDirX;
       dirY = newDirY;
     }
 
     if (newChar === "/") {
-      let newDirX = 0;
-      let newDirY = 0;
-      if (dirY === 1) newDirX = -1; // going down (y>0) // // go left (x<0)
-      else if (dirY === -1) newDirX = 1; // going up // (y<0) // go right (x>0)
-      if (dirX === 1) newDirY = -1; // going right (x>0) // // go up (y<0)
-      else if (dirX === -1) newDirY = 1; // going left // (x<0) // go down (y>0)
+      const newDirX = dirY === 1 ? -1 : dirY === -1 ? 1 : 0;
+      const newDirY = dirX === 1 ? -1 : dirX === -1 ? 1 : 0;
       dirX = newDirX;
       dirY = newDirY;
     }
@@ -108,8 +99,7 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       { dirX: 1, dirY: 0 },
       energizedPositions
     );
-    energizedPositions = combineLists({ list1: left, list2: right });
-    return energizedPositions;
+    return combineLists({ list1: left, list2: right });
   }
 
   if (newChar === "|" && dirY === 0 && !isInArray) {
@@ -126,10 +116,8 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
       energizedPositions
     );
 
-    energizedPositions = combineLists({ list1: up, list2: down });
-    return energizedPositions;
+    return combineLists({ list1: up, list2: down });
   }
-
   return energizedPositions;
 };
 
