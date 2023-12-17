@@ -1,3 +1,4 @@
+const { dir } = require("console");
 const f = require("fs");
 
 const lines = f
@@ -31,23 +32,68 @@ const combineLists = ({ list1, list2 }) => {
   return combined;
 };
 
+const charNeedsRecursion = (char, dirX, dirY) => {
+  if (char === "-" && dirX === 0) return true;
+  if (char === "|" && dirY === 0) return true;
+  return false;
+};
+
 const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
   // console.log(energizedPositions.length);
 
-  const newX = posX + dirX;
-  const newY = posY + dirY;
+  let newX = posX;
+  let newY = posY;
 
-  if (!insideMap({ x: newX, y: newY })) {
-    return energizedPositions;
+  // if (!insideMap({ x: newX, y: newY })) {
+  //   return energizedPositions;
+  // }
+
+  let newChar = map[newY][newX];
+
+  while (true) {
+    newX += dirX;
+    newY += dirY;
+    newChar = map[newY][newX];
+    if (!insideMap({ x: newX, y: newY })) {
+      return energizedPositions;
+    }
+    if (!isInArray({ x: newX, y: newY }, energizedPositions)) {
+      energizedPositions.push({
+        x: newX,
+        y: newY,
+      });
+    }
+    if (charNeedsRecursion(newChar, dirX, dirY)) {
+      break;
+    }
+
+    if (newChar === ".") {
+      continue;
+    }
+    if (newChar === "\\") {
+      let newDirX = 0;
+      let newDirY = 0;
+      if (dirY === -1) newDirX = -1;
+      else if (dirY === 1) newDirX = 1;
+      if (dirX === 1) newDirY = 1; // going right (x>0) // go up (y<0)
+      else if (dirX === -1) newDirY = -1; // going left (x<0) // go down (y>0)
+      dirX = newDirX;
+      dirY = newDirY;
+    }
+
+    if (newChar === "/") {
+      let newDirX = 0;
+      let newDirY = 0;
+      if (dirY === 1) newDirX = -1; // going down (y>0) // // go left (x<0)
+      else if (dirY === -1) newDirX = 1; // going up // (y<0) // go right (x>0)
+      if (dirX === 1) newDirY = -1; // going right (x>0) // // go up (y<0)
+      else if (dirX === -1) newDirY = 1; // going left // (x<0) // go down (y>0)
+      dirX = newDirX;
+      dirY = newDirY;
+    }
   }
 
-  const isInArray = inArray({ x: newX, y: newY }, energizedPositions);
-  if (!isInArray) {
-    energizedPositions.push({
-      x: newX,
-      y: newY,
-    });
-  } /*else {
+  /*else {
     return energized(map, { posX: newX, posY: newY }, { dirX, dirY }, [
       ...energizedPositions,
     ]);
@@ -55,12 +101,7 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
 
   //console.log(newY, newX, energizedPositions.length);
 
-  const newChar = map[newY][newX];
-  if (newChar === ".") {
-    return energized(map, { posX: newX, posY: newY }, { dirX, dirY }, [
-      ...energizedPositions,
-    ]);
-  }
+  // const newChar = map[newY][newX];
 
   if (newChar === "-" && dirX === 0 && !isInArray) {
     const left = energized(
@@ -79,38 +120,6 @@ const energized = (map, { posX, posY }, { dirX, dirY }, energizedPositions) => {
     if (left.inside || right.inside) console.log("PROBLEMinside");
 
     return energizedPositions;
-  }
-
-  if (newChar === "\\") {
-    let newDirX = 0;
-    let newDirY = 0;
-    if (dirY === -1) newDirX = -1;
-    else if (dirY === 1) newDirX = 1;
-    if (dirX === 1) newDirY = 1; // going right (x>0) // go up (y<0)
-    else if (dirX === -1) newDirY = -1; // going left (x<0) // go down (y>0)
-    return energized(
-      map,
-      { posX: newX, posY: newY },
-      { dirX: newDirX, dirY: newDirY },
-      [...energizedPositions]
-    );
-  }
-
-  if (newChar === "/") {
-    //console.log("slash", posY, posX, newY, newX, dirY, dirX);
-    let newDirX = 0;
-    let newDirY = 0;
-    if (dirY === 1) newDirX = -1; // going down (y>0) // // go left (x<0)
-    else if (dirY === -1) newDirX = 1; // going up // (y<0) // go right (x>0)
-    if (dirX === 1) newDirY = -1; // going right (x>0) // // go up (y<0)
-    else if (dirX === -1) newDirY = 1; // going left // (x<0) // go down (y>0)
-
-    return energized(
-      map,
-      { posX: newX, posY: newY },
-      { dirX: newDirX, dirY: newDirY },
-      [...energizedPositions]
-    );
   }
 
   if (newChar === "|" && dirY === 0 && !isInArray) {
